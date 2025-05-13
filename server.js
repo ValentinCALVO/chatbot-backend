@@ -14,6 +14,9 @@ const fakeUsers = [
   { id: '4', email: 'perrine.moerman@lyon.fr', password: '1234', service: 'Direction' }
 ];
 
+// 💾 Historique des messages par utilisateur
+const messageHistory = {};
+
 // 🔐 Login endpoint
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
