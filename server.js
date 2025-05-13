@@ -11,7 +11,7 @@ const fakeUsers = [
   { id: '1', email: 'valentin.calvo@lyon.fr', password: '1234', service: 'Direction' },
   { id: '2', email: 'axelle.coatan@lyon.fr', password: '1234', service: 'Direction' },
   { id: '3', email: 'manon.latapie@lyon.fr', password: '1234', service: 'Direction' },
-  { id: '2', email: 'perrine.moerman@lyon.fr', password: '1234', service: 'Direction' }
+  { id: '4', email: 'perrine.moerman@lyon.fr', password: '1234', service: 'Direction' }
 ];
 
 // 🔐 Login endpoint
