@@ -76,6 +76,46 @@ app.post("/chat", (req, res) => {
   res.json({ reply });
 });
 
+const express = require('express');
+const cors = require('cors');
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const fakeUsers = [
+  { id: '1', email: 'paul@lyon.fr', password: 'secret', service: 'DRH' },
+  { id: '2', email: 'lea@lyon.fr', password: '1234', service: 'Direction' }
+];
+
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  const user = fakeUsers.find(u => u.email === email && u.password === password);
+  if (user) {
+    res.json({ user: { id: user.id, email: user.email, service: user.service } });
+  } else {
+    res.status(401).json({ error: "Identifiants incorrects" });
+  }
+});
+
+app.get('/history/:userId', (req, res) => {
+  const messages = [
+    { sender: 'bot', text: 'Bonjour, comment puis-je vous aider ?' },
+    { sender: 'user', text: 'Quels sont les congés possibles ?' }
+  ];
+  res.json({ messages });
+});
+
+app.post('/chat', (req, res) => {
+  const { message, userId } = req.body;
+  const reply = `Vous avez dit : "${message}" (ID utilisateur : ${userId})`;
+  res.json({ reply });
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log('Serveur backend en ligne');
+});
+
+
 app.listen(3000, () => {
   console.log("✅ Serveur enrichi prêt sur http://localhost:3000");
 });
