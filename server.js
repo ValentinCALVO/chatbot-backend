@@ -25,10 +25,7 @@ app.post('/login', (req, res) => {
 
 // 💬 Historique (fictif pour le moment)
 app.get('/history/:userId', (req, res) => {
-  const messages = [
-    { sender: 'bot', text: 'Bonjour, comment puis-je vous aider ?' },
-    { sender: 'user', text: 'Quels sont les congés possibles ?' }
-  ];
+  const messages = []; // 🔥 Plus aucun message automatique
   res.json({ messages });
 });
 
