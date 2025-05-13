@@ -25,7 +25,7 @@ app.post("/chat", async (req, res) => {
 
     res.json({ reply: completion.choices[0].message.content });
   } catch (err) {
-    console.error("Erreur OpenAI:", err);
+    console.error("Erreur OpenAI:", err); // ✅ plus clair
     res.status(500).json({ error: "Erreur lors de la génération de réponse." });
   }
 });
