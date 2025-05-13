@@ -129,6 +129,13 @@ app.post("/chat", (req, res) => {
   res.json({ reply });
 });
 
+// 📝 Sauvegarde de l'historique
+if (!messageHistory[userId]) {
+  messageHistory[userId] = [];
+}
+messageHistory[userId].push({ sender: 'user', text: message });
+messageHistory[userId].push({ sender: 'bot', text: reply });
+
 // 🚀 Lancement du serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
