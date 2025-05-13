@@ -1,42 +1,30 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import OpenAI from "openai";
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY // ✅ Lecture depuis la variable d’environnement
-});
+app.post("/chat", (req, res) => {
+  const userMessage = req.body.message.toLowerCase();
+  let reply = "Je suis désolé, je n'ai pas compris votre question. Pouvez-vous reformuler ?";
 
-app.post("/chat", async (req, res) => {
-  const userMessage = req.body.message;
-
-  if (!userMessage) {
-    return res.status(400).json({ error: "Message utilisateur manquant." });
+  if (/entretien|recruteur|rdv|rendez-vous/.test(userMessage)) {
+    reply = "Préparez-vous à parler de vos expériences, soyez ponctuel et montrez votre motivation.";
+  } else if (/cv|curriculum/.test(userMessage)) {
+    reply = "Un bon CV doit être clair, structuré et adapté au poste visé.";
+  } else if (/lettre|motivation/.test(userMessage)) {
+    reply = "Une lettre de motivation doit être personnalisée et expliquer pourquoi vous postulez.";
+  } else if (/soft skill|compétence relationnelle/.test(userMessage)) {
+    reply = "Les soft skills recherchées incluent la communication, l’adaptabilité et le travail en équipe.";
+  } else if (/offre|poste|emploi/.test(userMessage)) {
+    reply = "Pour postuler à une offre, lisez bien l’annonce et adaptez votre CV et lettre en conséquence.";
   }
 
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "Tu es un assistant RH spécialisé en recrutement. Réponds de manière concise, professionnelle et utile."
-        },
-        { role: "user", content: userMessage }
-      ]
-    });
-
-    res.json({ reply: completion.choices[0].message.content });
-  } catch (err) {
-    console.error("🔥 Erreur OpenAI:", err.response?.data || err.message || err);
-    res.status(500).json({ error: "Erreur lors de la génération de la réponse." });
-  }
+  res.json({ reply });
 });
 
 app.listen(3000, () => {
-  console.log("✅ Serveur lancé sur http://localhost:3000");
+  console.log("✅ Serveur simulé prêt sur http://localhost:3000");
 });
