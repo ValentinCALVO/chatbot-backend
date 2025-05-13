@@ -30,8 +30,9 @@ app.post('/login', (req, res) => {
 
 // 💬 Historique (fictif pour le moment)
 app.get('/history/:userId', (req, res) => {
-  const messages = []; // aucun message préchargé
-  res.json({ messages });
+  const userId = req.params.userId;
+const messages = messageHistory[userId] || [];
+res.json({ messages });
 });
 
 // 🤖 Chat principal
