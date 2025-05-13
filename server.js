@@ -8,8 +8,8 @@ app.use(bodyParser.json());
 
 // ⚡ Fake users RH
 const fakeUsers = [
-  { id: '1', email: 'paul@lyon.fr', password: 'secret', service: 'DRH' },
-  { id: '2', email: 'lea@lyon.fr', password: '1234', service: 'Direction' }
+  { id: '1', email: 'valentin.calvo@lyon.fr', password: '1234', service: 'DRH' },
+  { id: '2', email: 'perrine.moerman@lyon.fr', password: '1234', service: 'Direction' }
 ];
 
 // 🔐 Login endpoint
