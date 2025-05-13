@@ -127,15 +127,15 @@ app.post("/chat", (req, res) => {
     reply = "Vous pouvez contacter le service RH à emploi@grandlyon.com ou envoyer un courrier : Métropole de Lyon - DRH - 20 rue du Lac - CS 33569 - 69505 Lyon Cedex 3";
   }
 
+  // ✅ Ajouter ce bloc ici :
+  if (!messageHistory[userId]) {
+    messageHistory[userId] = [];
+  }
+  messageHistory[userId].push({ sender: 'user', text: message });
+  messageHistory[userId].push({ sender: 'bot', text: reply });
+
   res.json({ reply });
 });
-
-// 📝 Sauvegarde de l'historique
-if (!messageHistory[userId]) {
-  messageHistory[userId] = [];
-}
-messageHistory[userId].push({ sender: 'user', text: message });
-messageHistory[userId].push({ sender: 'bot', text: reply });
 
 // 🚀 Lancement du serveur
 const PORT = process.env.PORT || 3000;
