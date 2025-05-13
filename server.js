@@ -8,7 +8,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const openai = new OpenAI({
-  apiKey: "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" // ⚠️ NE laisse jamais une clé exposée publiquement
+  apiKey: process.env.OPENAI_API_KEY // ✅ Lecture depuis la variable d’environnement
 });
 
 app.post("/chat", async (req, res) => {
