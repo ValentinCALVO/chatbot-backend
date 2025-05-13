@@ -8,7 +8,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const openai = new OpenAI({
-  apiKey: "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" // ⚠️ NE laisse jamais une clé exposée publiquement
+  apiKey: "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" // ⚠️ NE laisse jamais une clé exposée publiquement
 });
 
 app.post("/chat", async (req, res) => {
