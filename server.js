@@ -25,7 +25,7 @@ app.post('/login', (req, res) => {
 
 // 💬 Historique (fictif pour le moment)
 app.get('/history/:userId', (req, res) => {
-  const messages = []; // 🔥 Plus aucun message automatique
+  const messages = []; // aucun message préchargé
   res.json({ messages });
 });
 
