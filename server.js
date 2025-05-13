@@ -50,13 +50,6 @@ app.post("/chat", (req, res) => {
     reply = "Consultez nos offres sur https://www.grandlyon.com.";
   }
 
-  // Personnalisation par service
-  if (userId === '1') {
-    reply += " [Réponse personnalisée pour DRH]";
-  } else if (userId === '2') {
-    reply += " [Réponse personnalisée pour Direction]";
-  }
-
   res.json({ reply });
 });
 
