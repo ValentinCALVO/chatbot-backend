@@ -1,0 +1,27 @@
+[
+  {
+    "theme": "Santé et sécurité",
+    "questions": ["epi", "équipements", "chaussures", "sécurité", "fumer", "pause cigarette"],
+    "reponse": "Le port des EPI est obligatoire dans les zones à risque. Deux pauses de 10 min sont autorisées pour les fumeurs."
+  },
+  {
+    "theme": "Discipline",
+    "questions": ["avertissement", "sanction", "mise à pied", "licenciement", "discipline"],
+    "reponse": "Les sanctions vont de l’avertissement au licenciement. L'employé peut se défendre avant toute décision."
+  },
+  {
+    "theme": "Horaires",
+    "questions": ["horaire", "travail", "temps", "flexible"],
+    "reponse": "Les horaires standard sont de 9h à 17h. Des horaires flexibles sont possibles avec accord du service."
+  },
+  {
+    "theme": "Harcèlement et discrimination",
+    "questions": ["harcèlement", "discrimination", "sexiste", "signalement"],
+    "reponse": "Le harcèlement et les discriminations sont interdits. Signalez tout fait à la DRH en toute confidentialité."
+  },
+  {
+    "theme": "Lanceurs d’alerte",
+    "questions": ["alerte", "lanceur", "signalement", "confidentiel"],
+    "reponse": "Un dispositif protège les lanceurs d’alerte. Vous pouvez signaler en toute confidentialité."
+  }
+]
