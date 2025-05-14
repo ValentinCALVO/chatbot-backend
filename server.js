@@ -187,6 +187,13 @@ app.post("/chat", (req, res) => {
   messageHistory[userId].push({ sender: 'user', text: message });
   messageHistory[userId].push({ sender: 'bot', text: reply });
 
+  } else if (/rendez-vous|rdv|rencontrer.*rh/.test(message)) {
+  reply = "Souhaitez-vous réserver un créneau avec un conseiller RH ? Tapez **'prendre rendez-vous'** pour continuer.";
+}
+} else if (/prendre.*rendez-vous/.test(message)) {
+  reply = "Voici les créneaux disponibles : [EN ATTENTE DE CHARGEMENT].";
+}
+  
   res.json({ reply });
 });
 
