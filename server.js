@@ -190,6 +190,34 @@ app.post("/chat", (req, res) => {
   res.json({ reply });
 });
 
+// 📅 Récupération des créneaux disponibles
+app.get('/appointments/slots', async (req, res) => {
+  const appointments = await fs.readJson('./data/appointments.json');
+  const takenSlots = appointments.map(a => a.slot);
+  const allSlots = [
+    "2025-05-15T09:00", "2025-05-15T10:00", "2025-05-15T11:00",
+    "2025-05-16T14:00", "2025-05-16T15:00", "2025-05-17T10:00"
+  ];
+  const available = allSlots.filter(slot => !takenSlots.includes(slot));
+  res.json({ slots: available });
+});
+
+// 📅 Réservation d’un créneau
+app.post('/appointments/book', async (req, res) => {
+  const { userId, slot } = req.body;
+  if (!userId || !slot) return res.status(400).json({ error: "Données manquantes" });
+
+  const appointments = await fs.readJson('./data/appointments.json');
+  if (appointments.find(a => a.slot === slot)) {
+    return res.status(400).json({ error: "Créneau déjà pris" });
+  }
+
+  appointments.push({ id: uuid(), userId, slot });
+  await fs.writeJson('./data/appointments.json', appointments, { spaces: 2 });
+
+  res.json({ success: true });
+});
+
 // 🚀 Lancement du serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
