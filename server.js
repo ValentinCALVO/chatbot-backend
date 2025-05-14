@@ -81,138 +81,26 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   res.json({ success: true });
 });
 
-// 💬 Historique (fictif pour le moment)
-app.get('/history/:userId', (req, res) => {
-  const userId = req.params.userId;
-const messages = messageHistory[userId] || [];
-res.json({ messages });
-});
-
-// 🤖 Chat principal
-app.post("/chat", (req, res) => {
-  const message = req.body.message.toLowerCase();
-  const userId = req.body.userId;
-
-  let reply = "Je suis désolé, je n'ai pas compris votre question. Pouvez-vous la reformuler ?";
-
-  // Politesse
-  if (/bonjour|salut/.test(message)) {
-    reply = "Bonjour ! Comment puis-je vous aider concernant la Métropole de Lyon ?";
-  } else if (/merci/.test(message)) {
-    reply = "Avec plaisir ! N'hésitez pas à poser d'autres questions.";
-  } else if (/au revoir|à bientôt/.test(message)) {
-    reply = "Au revoir et à bientôt !";
-  } else if (/ça va|ca va/.test(message)) {
-    reply = "Je vais bien, merci ! Et vous, comment puis-je vous aider ?";
-
-  // Recrutement / Processus
-  } else if (/candidature|recrutement|postuler|embauche/.test(message)) {
-    reply = "Vous pouvez postuler via https://www.grandlyon.com. La procédure comprend : sélection du CV/lettre, entretien(s), tests éventuels, visite médicale, vérification du casier judiciaire, puis embauche officielle.";
-
-  // CV / Lettre de motivation
-  } else if (/cv|curriculum/.test(message)) {
-    reply = "Un bon CV doit être clair, concis et valoriser vos expériences pertinentes. Privilégiez les expériences en lien avec le service public.";
-  } else if (/lettre|motivation/.test(message)) {
-    reply = "Votre lettre doit exprimer votre intérêt pour les missions publiques et la Métropole de Lyon. Expliquez pourquoi vous êtes un bon candidat pour le poste.";
-
-  // Entretien
-  } else if (/entretien|oral|recruteur|face à face/.test(message)) {
-    reply = "Préparez des exemples concrets, informez-vous sur la Métropole, ses missions et ses engagements. Soyez prêt à parler de vos valeurs et de votre parcours.";
-
-  // Offres d'emploi
-  } else if (/emploi|poste|offre|vacance/.test(message)) {
-    reply = "Toutes nos offres sont disponibles sur : https://www.grandlyon.com/services/nous-rejoindre/nos-offres-demploi.html";
-
-  // Formation / Mobilité
-  } else if (/formation|se former/.test(message)) {
-    reply = "62% des agents sont formés chaque année. Formations internes variées pour progresser et évoluer professionnellement.";
-  } else if (/mobilité/.test(message)) {
-    reply = "Nos conseillers RH accompagnent les agents souhaitant changer de poste, construire un nouveau projet ou évoluer.";
-
-  // Conditions de travail / QVT
-  } else if (/télétravail/.test(message)) {
-    reply = "Jusqu’à 2 jours de télétravail par semaine sont possibles pour les postes éligibles.";
-  } else if (/semaine.*4 jours/.test(message)) {
-    reply = "Depuis 2023, les agents volontaires peuvent expérimenter la semaine de 4 jours.";
-  } else if (/vie pro.*vie perso|équilibre/.test(message)) {
-    reply = "La Métropole met en œuvre des dispositifs concrets : charte de déconnexion, parentalité, nomadisme, télétravail, etc.";
-
-  // RSE / Valeurs
-  } else if (/valeurs|rse|responsabilité/.test(message)) {
-    reply = "Nous agissons pour l’inclusion, la diversité, l’égalité femmes-hommes, le handicap, et l’écologie. En savoir plus sur notre RSE : https://www.grandlyon.com/";
-
-  // Concours / CDD / Contrats
-  } else if (/concours/.test(message)) {
-    reply = "Le concours est la voie classique pour devenir fonctionnaire territorial. Infos : A+ sur https://www.cnfpt.fr, autres catégories sur https://www.cdg69.fr";
-  } else if (/cdd|contrat/.test(message)) {
-    reply = "Des CDD sont possibles pour remplacement, besoins ponctuels ou postes spécifiques. Certains débouchent sur titularisation après concours.";
-
-  // Apprentissage / Job d'été
-  } else if (/apprentissage|alternance/.test(message)) {
-    reply = "Oui, la Métropole propose des contrats d’apprentissage du CAP au Bac+5, dans +10 domaines. Plus d'infos sur le site officiel.";
-  } else if (/job d'été|emploi saisonnier/.test(message)) {
-    reply = "Des jobs d’été sont disponibles (propreté, administratif, enfance). Conditions : +18 ans, étudiant, ou suivi par mission locale/RSA/RSJ.";
-
-  // Handicap / RQTH
-  } else if (/handicap|rqth/.test(message)) {
-    reply = "Les agents en situation de handicap bénéficient d’un accompagnement individualisé, aménagements, aides techniques, titularisation possible sans concours avec RQTH.";
-
-  // Infos générales
-  } else if (/communes/.test(message)) {
-    reply = "La Métropole regroupe 58 communes.";
-  } else if (/habitants/.test(message)) {
-    reply = "La Métropole de Lyon compte environ 1,4 million d'habitants.";
-  } else if (/métiers/.test(message)) {
-    reply = "Plus de 250 métiers différents sont exercés dans la Métropole, dans des domaines variés.";
-  } else if (/secteurs|domaines/.test(message)) {
-    reply = "Environnement, urbanisme, social, médico-social, RH, numérique, culture, sport, développement économique, mobilité...";
-
-  // Vie au travail / Avantages
-  } else if (/restaurant|repas/.test(message)) {
-    reply = "Selon les sites, vous bénéficiez de titres-restaurant ou d’un restaurant collectif.";
-  } else if (/comité|loisirs/.test(message)) {
-    reply = "Vous avez accès à l’offre du COS (culture, loisirs, voyages, billetterie).";
-  } else if (/conciergerie/.test(message)) {
-    reply = "Des services de conciergerie sont accessibles selon le lieu de travail.";
-
-  // RH / Contact
-  } else if (/contact|rh|recrutement/.test(message)) {
-    reply = "Vous pouvez contacter le service RH à emploi@grandlyon.com ou envoyer un courrier : Métropole de Lyon - DRH - 20 rue du Lac - CS 33569 - 69505 Lyon Cedex 3";
-  }
-
-  // ✅ Ajouter ce bloc ici :
-  if (!messageHistory[userId]) {
-    messageHistory[userId] = [];
-  }
-  messageHistory[userId].push({ sender: 'user', text: message });
-  messageHistory[userId].push({ sender: 'bot', text: reply });
-
-  } else if (/rendez-vous|rdv|rencontrer.*rh/.test(message)) {
-  reply = "Souhaitez-vous réserver un créneau avec un conseiller RH ? Tapez **'prendre rendez-vous'** pour continuer.";
-}
-} else if (/prendre.*rendez-vous/.test(message)) {
-  reply = "Voici les créneaux disponibles : [EN ATTENTE DE CHARGEMENT].";
-}
-  
-  res.json({ reply });
-});
-
-// 📅 Récupération des créneaux disponibles
+// 📅 Créneaux disponibles
 app.get('/appointments/slots', async (req, res) => {
   const appointments = await fs.readJson('./data/appointments.json');
   const takenSlots = appointments.map(a => a.slot);
+
   const allSlots = [
     "2025-05-15T09:00", "2025-05-15T10:00", "2025-05-15T11:00",
     "2025-05-16T14:00", "2025-05-16T15:00", "2025-05-17T10:00"
   ];
+
   const available = allSlots.filter(slot => !takenSlots.includes(slot));
   res.json({ slots: available });
 });
 
-// 📅 Réservation d’un créneau
+// 📅 Réservation de créneau
 app.post('/appointments/book', async (req, res) => {
   const { userId, slot } = req.body;
-  if (!userId || !slot) return res.status(400).json({ error: "Données manquantes" });
+  if (!userId || !slot) {
+    return res.status(400).json({ error: "Données manquantes" });
+  }
 
   const appointments = await fs.readJson('./data/appointments.json');
   if (appointments.find(a => a.slot === slot)) {
@@ -223,6 +111,96 @@ app.post('/appointments/book', async (req, res) => {
   await fs.writeJson('./data/appointments.json', appointments, { spaces: 2 });
 
   res.json({ success: true });
+});
+
+// 💬 Historique (fictif pour le moment)
+app.get('/history/:userId', (req, res) => {
+  const userId = req.params.userId;
+  const messages = messageHistory[userId] || [];
+  res.json({ messages });
+});
+
+// 🤖 Chat principal
+app.post("/chat", (req, res) => {
+  const message = req.body.message.toLowerCase();
+  const userId = req.body.userId;
+
+  let reply = "Je suis désolé, je n'ai pas compris votre question. Pouvez-vous la reformuler ?";
+
+  if (/bonjour|salut/.test(message)) {
+    reply = "Bonjour ! Comment puis-je vous aider concernant la Métropole de Lyon ?";
+  } else if (/merci/.test(message)) {
+    reply = "Avec plaisir ! N'hésitez pas à poser d'autres questions.";
+  } else if (/au revoir|à bientôt/.test(message)) {
+    reply = "Au revoir et à bientôt !";
+  } else if (/ça va|ca va/.test(message)) {
+    reply = "Je vais bien, merci ! Et vous, comment puis-je vous aider ?";
+
+  } else if (/candidature|recrutement|postuler|embauche/.test(message)) {
+    reply = "Vous pouvez postuler via https://www.grandlyon.com...";
+  } else if (/cv|curriculum/.test(message)) {
+    reply = "Un bon CV doit être clair, concis et valoriser vos expériences pertinentes...";
+  } else if (/lettre|motivation/.test(message)) {
+    reply = "Votre lettre doit exprimer votre intérêt pour les missions publiques...";
+  } else if (/entretien|oral|recruteur|face à face/.test(message)) {
+    reply = "Préparez des exemples concrets, informez-vous sur la Métropole...";
+  } else if (/emploi|poste|offre|vacance/.test(message)) {
+    reply = "Toutes nos offres sont disponibles sur : https://www.grandlyon.com/services/nous-rejoindre/nos-offres-demploi.html";
+  } else if (/formation|se former/.test(message)) {
+    reply = "62% des agents sont formés chaque année...";
+  } else if (/mobilité/.test(message)) {
+    reply = "Nos conseillers RH accompagnent les agents souhaitant évoluer...";
+  } else if (/télétravail/.test(message)) {
+    reply = "Jusqu’à 2 jours de télétravail par semaine sont possibles...";
+  } else if (/semaine.*4 jours/.test(message)) {
+    reply = "Depuis 2023, les agents volontaires peuvent expérimenter la semaine de 4 jours.";
+  } else if (/vie pro.*vie perso|équilibre/.test(message)) {
+    reply = "La Métropole met en œuvre des dispositifs concrets...";
+  } else if (/valeurs|rse|responsabilité/.test(message)) {
+    reply = "Nous agissons pour l’inclusion, la diversité, l’égalité...";
+  } else if (/concours/.test(message)) {
+    reply = "Le concours est la voie classique pour devenir fonctionnaire territorial...";
+  } else if (/cdd|contrat/.test(message)) {
+    reply = "Des CDD sont possibles pour remplacement ou besoins ponctuels...";
+  } else if (/apprentissage|alternance/.test(message)) {
+    reply = "La Métropole propose des contrats d’apprentissage dans +10 domaines.";
+  } else if (/job d'été|emploi saisonnier/.test(message)) {
+    reply = "Des jobs d’été sont disponibles...";
+  } else if (/handicap|rqth/.test(message)) {
+    reply = "Les agents en situation de handicap bénéficient d’un accompagnement...";
+  } else if (/communes/.test(message)) {
+    reply = "La Métropole regroupe 58 communes.";
+  } else if (/habitants/.test(message)) {
+    reply = "La Métropole de Lyon compte environ 1,4 million d'habitants.";
+  } else if (/métiers/.test(message)) {
+    reply = "Plus de 250 métiers différents sont exercés dans la Métropole.";
+  } else if (/secteurs|domaines/.test(message)) {
+    reply = "Environnement, urbanisme, social, médico-social, RH, numérique...";
+  } else if (/restaurant|repas/.test(message)) {
+    reply = "Vous bénéficiez de titres-restaurant ou d’un restaurant collectif.";
+  } else if (/comité|loisirs/.test(message)) {
+    reply = "Vous avez accès à l’offre du COS (culture, loisirs, voyages...).";
+  } else if (/conciergerie/.test(message)) {
+    reply = "Des services de conciergerie sont accessibles selon le lieu de travail.";
+  } else if (/contact|rh|recrutement/.test(message)) {
+    reply = "Vous pouvez contacter le service RH à emploi@grandlyon.com...";
+
+  // ✅ Détection demande de RDV
+  } else if (/rendez-vous|rdv|rencontrer.*rh/.test(message.toLowerCase())) {
+    reply = "Souhaitez-vous réserver un créneau avec un conseiller RH ? Tapez **'prendre rendez-vous'** pour continuer.";
+
+  } else if (/prendre.*rendez-vous/.test(message.toLowerCase())) {
+    reply = "Voici les créneaux disponibles : [EN ATTENTE DE CHARGEMENT].";
+  }
+
+  // 🧠 Historique
+  if (!messageHistory[userId]) {
+    messageHistory[userId] = [];
+  }
+  messageHistory[userId].push({ sender: 'user', text: message });
+  messageHistory[userId].push({ sender: 'bot', text: reply });
+
+  res.json({ reply });
 });
 
 // 🚀 Lancement du serveur
