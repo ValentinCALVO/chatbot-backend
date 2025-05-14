@@ -2,6 +2,12 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 
+import fs from "fs-extra";
+import multer from "multer";
+import { v4 as uuid } from "uuid";
+
+const upload = multer({ dest: "uploads/" });
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -26,6 +32,53 @@ app.post('/login', (req, res) => {
   } else {
     res.status(401).json({ error: "Identifiants incorrects" });
   }
+});
+
+app.get("/cv/:userId", async (req, res) => {
+  const profiles = await fs.readJson("./data/profiles.json");
+  const user = profiles.find(p => p.id === req.params.userId);
+  if (!user) return res.status(404).json({ error: "Profil non trouvé" });
+  res.json(user.cv || {});
+});
+
+app.post("/cv/:userId", async (req, res) => {
+  const profiles = await fs.readJson("./data/profiles.json");
+  const user = profiles.find(p => p.id === req.params.userId);
+  if (!user) return res.status(404).json({ error: "Utilisateur non trouvé" });
+
+  user.cv = req.body;
+  await fs.writeJson("./data/profiles.json", profiles, { spaces: 2 });
+  res.json({ success: true });
+});
+
+app.get("/applications/:userId", async (req, res) => {
+  const apps = await fs.readJson("./data/applications.json");
+  const userApps = apps.filter(a => a.userId === req.params.userId);
+  res.json(userApps);
+});
+
+app.post("/applications", async (req, res) => {
+  const apps = await fs.readJson("./data/applications.json");
+  const newApp = { id: uuid(), ...req.body };
+  apps.push(newApp);
+  await fs.writeJson("./data/applications.json", apps, { spaces: 2 });
+  res.json({ success: true });
+});
+
+app.post("/upload", upload.single("file"), async (req, res) => {
+  const { userId } = req.body;
+  const documents = await fs.readJson("./data/documents.json");
+
+  documents.push({
+    id: uuid(),
+    userId,
+    filename: req.file.originalname,
+    path: req.file.path,
+    uploadedAt: new Date().toISOString()
+  });
+
+  await fs.writeJson("./data/documents.json", documents, { spaces: 2 });
+  res.json({ success: true });
 });
 
 // 💬 Historique (fictif pour le moment)
