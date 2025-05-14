@@ -110,6 +110,31 @@ app.post('/appointments/book', async (req, res) => {
   appointments.push({ id: uuid(), userId, slot });
   await fs.writeJson('./data/appointments.json', appointments, { spaces: 2 });
 
+  console.log(`📧 Email simulé à l'utilisateur ${userId} : Confirmation du RDV le ${slot}`);
+res.json({ success: true, message: `RDV réservé pour ${slot}` });
+});
+
+// 📅 Obtenir les rendez-vous réservés d'un utilisateur
+app.get('/appointments/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const appointments = await fs.readJson('./data/appointments.json');
+  const userAppointments = appointments.filter(a => a.userId === userId);
+  res.json(userAppointments);
+});
+
+// ❌ Annuler un rendez-vous
+app.delete('/appointments/:appointmentId', async (req, res) => {
+  const appointmentId = req.params.appointmentId;
+  let appointments = await fs.readJson('./data/appointments.json');
+  const initialLength = appointments.length;
+
+  appointments = appointments.filter(a => a.id !== appointmentId);
+  await fs.writeJson('./data/appointments.json', appointments, { spaces: 2 });
+
+  if (appointments.length === initialLength) {
+    return res.status(404).json({ error: "Rendez-vous non trouvé" });
+  }
+
   res.json({ success: true });
 });
 
