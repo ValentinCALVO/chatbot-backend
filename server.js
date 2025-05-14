@@ -1,3 +1,4 @@
+import reglement from './data/reglement.json' assert { type: "json" };
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -225,6 +226,13 @@ app.post("/chat", (req, res) => {
   messageHistory[userId].push({ sender: 'user', text: message });
   messageHistory[userId].push({ sender: 'bot', text: reply });
 
+for (const article of reglement) {
+  if (article.questions.some(q => message.includes(q))) {
+    reply = `${article.emoji} ${article.reponse}`;
+    break;
+  }
+}
+  
   res.json({ reply });
 });
 
