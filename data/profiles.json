@@ -1,0 +1,11 @@
+[
+  {
+    "id": "1",
+    "email": "valentin.calvo@lyon.fr",
+    "cv": {
+      "competences": ["Communication", "Gestion RH"],
+      "experiences": ["Responsable RH – Métropole de Lyon (2018–2024)"],
+      "formations": ["Master RH", "Management bienveillant"]
+    }
+  }
+]
