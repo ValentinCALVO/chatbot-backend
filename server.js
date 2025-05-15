@@ -246,10 +246,12 @@ else if (/(rendez[- ]?vous|rdv|rencontrer.*rh)/.test(message)) {
   messageHistory[userId].push({ sender: 'user', text: message });
   messageHistory[userId].push({ sender: 'bot', text: reply });
 
-for (const article of reglement) {
-  if (article.questions.some(q => message.includes(q))) {
-    reply = `${article.emoji} ${article.reponse}`;
-    break;
+for (const rubrique of reglement) {
+  for (const article of rubrique.articles || []) {
+    if (Array.isArray(article.questions) && article.questions.some(q => message.includes(q))) {
+      reply = `${article.emoji} ${article.texte_complet}`;
+      break;
+    }
   }
 }
 
