@@ -211,13 +211,13 @@ app.post("/chat", (req, res) => {
   } else if (/contact|rh|recrutement/.test(message)) {
     reply = "Vous pouvez contacter le service RH à emploi@grandlyon.com...";
 
-// 🎯 Bloc le plus spécifique en premier
+// 🎯 Bloc spécifique : si l'utilisateur tape "rdv", "réserver", "prendre rendez-vous", etc.
 } else if (/^(prendre\s*)?rendez[- ]?vous$|^rdv$|^réserver$|^disponibilités$|^créneaux$/.test(message.trim())) {
   reply = "Voici les créneaux disponibles : [EN ATTENTE DE CHARGEMENT].";
 }
 
-// 🧠 Bloc plus général ensuite
-} else if (/rendez-vous|rdv|rencontrer.*rh/.test(message)) {
+// 💬 Bloc général : si l'utilisateur dit juste "je veux parler RH" ou "rendez-vous ?"
+} else if (/rendez[- ]?vous|rdv|rencontrer.*rh/.test(message)) {
   reply = "Souhaitez-vous réserver un créneau avec un conseiller RH ? Tapez **'rdv'** ou **'réserver'** pour continuer.";
 }
 
