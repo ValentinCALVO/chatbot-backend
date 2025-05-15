@@ -216,8 +216,8 @@ app.post("/chat", (req, res) => {
   reply = "Voici les créneaux disponibles : [EN ATTENTE DE CHARGEMENT].";
 }
 
-// 💬 Bloc général : si l'utilisateur dit juste "je veux parler RH" ou "rendez-vous ?"
-} else if (/rendez[- ]?vous|rdv|rencontrer.*rh/.test(message)) {
+// 💬 Bloc général : si l'utilisateur dit "je veux parler RH" ou "rendez-vous ?"
+} else if (/(rendez[- ]?vous|rdv|rencontrer.*rh)/.test(message)) {
   reply = "Souhaitez-vous réserver un créneau avec un conseiller RH ? Tapez **'rdv'** ou **'réserver'** pour continuer.";
 }
 
