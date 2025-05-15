@@ -26,15 +26,23 @@ const fakeUsers = [
 
 const messageHistory = {};
 
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  const user = fakeUsers.find(u => u.email === email && u.password === password);
-  if (user) {
-    res.json({ user: { id: user.id, email: user.email, service: user.service } });
-  } else {
-    res.status(401).json({ error: "Identifiants incorrects" });
+// 🔍 Fonction pour détecter les articles pertinents du règlement
+function chercherArticlesPertinents(message) {
+  const motsCle = message.toLowerCase().split(/[\s,;.!?]+/);
+  const resultats = [];
+
+  for (const section of reglement) {
+    for (const article of section.articles) {
+      if (article.questions.some(q => motsCle.includes(q))) {
+        resultats.push({
+          ...article,
+          titre_section: section.titre
+        });
+      }
+    }
   }
-});
+  return resultats;
+}
 
 // 📄 Fonction pour rechercher une question similaire
 function findSimilarContext(userId, currentMsg) {
@@ -52,9 +60,33 @@ app.post("/chat", (req, res) => {
   const userId = req.body.userId;
   if (!userContexts[userId]) userContexts[userId] = [];
 
+  // 🧠 1. Réponse règlementaire enrichie
+  const articlesTrouves = chercherArticlesPertinents(message);
+
+  if (articlesTrouves.length > 0) {
+    const rich = {
+      type: "rich",
+      className: "bubble",
+      elements: articlesTrouves.map(a => ({
+        type: "accordion",
+        title: `${a.emoji} ${a.titre_section} – ${a.sous_titre}`,
+        content: `${a.resume}\n\n${a.texte_complet}\n📄 Source : ${a.reference}`
+      }))
+    };
+
+    if (!messageHistory[userId]) messageHistory[userId] = [];
+    messageHistory[userId].push({ sender: "user", text: message });
+    messageHistory[userId].push({ sender: "bot", text: `[Réponse réglementaire : ${articlesTrouves.map(a => a.reference).join(", ")}]` });
+
+    userContexts[userId].push({ sender: 'user', text: message });
+    userContexts[userId].push({ sender: 'bot', text: `[Réponse règlementaire]` });
+
+    return res.json({ reply: "", rich });
+  }
+
+  // 🔁 Réponses conditionnelles aux suivis "oui / non"
   let reply = "Je suis désolé, je n'ai pas compris votre question. Pouvez-vous la reformuler ?";
 
-  // ✅ Réponses conditionnelles aux suivis "oui / non"
   if (followUpMap[userId] && /^(oui|yes|ok|d'accord)$/.test(message.trim())) {
     const topic = followUpMap[userId];
     followUpMap[userId] = null;
@@ -82,7 +114,7 @@ app.post("/chat", (req, res) => {
     return res.json({ reply });
   }
 
-  // 🧠 Priorité aux réponses spécifiques
+  // 🧠 Réponses prédéfinies
   if (/cv|curriculum/.test(message)) {
     reply = "Un bon CV doit être clair, concis et valoriser vos expériences pertinentes...";
   } else if (/lettre|motivation/.test(message)) {
@@ -111,29 +143,19 @@ app.post("/chat", (req, res) => {
     reply = "Des jobs d’été sont disponibles...";
   }
 
-  // 🧠 Historique
+  // 🧠 Historique + similarité
   if (!messageHistory[userId]) messageHistory[userId] = [];
   messageHistory[userId].push({ sender: 'user', text: message });
   messageHistory[userId].push({ sender: 'bot', text: reply });
 
-  for (const article of reglement) {
-    if (article.questions.some(q => message.includes(q))) {
-      reply = `${article.emoji} ${article.reponse}`;
-      break;
-    }
-  }
-
-  // 🔁 Détection de question similaire
   const similar = findSimilarContext(userId, message);
   if (similar) {
     reply += `\n🔁 Vous m'aviez posé une question similaire plus tôt. Souhaitez-vous que nous approfondissions ce sujet ?`;
 
-    // Enregistre le sujet pour suivi
     if (similar.text.includes("cv")) followUpMap[userId] = "cv";
     else if (similar.text.includes("formation")) followUpMap[userId] = "formation";
   }
 
-  // 🧠 Sauvegarde du contexte
   userContexts[userId].push({ sender: 'user', text: message });
   userContexts[userId].push({ sender: 'bot', text: reply });
   if (userContexts[userId].length > 20) {
@@ -143,7 +165,7 @@ app.post("/chat", (req, res) => {
   res.json({ reply });
 });
 
-// 🔁 Autres routes (inchangées)
+// 📁 Autres routes existantes (inchangées)
 app.get('/cv/:userId', async (req, res) => {
   const profiles = await fs.readJson("./data/profiles.json");
   const user = profiles.find(p => p.id === req.params.userId);
