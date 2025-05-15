@@ -1,3 +1,5 @@
+const userContexts = {}; // Mémoire conversationnelle par utilisateur
+
 import reglement from './data/reglement.json' assert { type: "json" };
 import express from "express";
 import cors from "cors";
