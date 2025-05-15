@@ -1,34 +1,28 @@
-const userContexts = {}; // Mémoire conversationnelle par utilisateur
-
 import reglement from './data/reglement.json' assert { type: "json" };
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-
 import fs from "fs-extra";
 import multer from "multer";
 import { v4 as uuid } from "uuid";
 
 const upload = multer({ dest: "uploads/" });
-
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// 💾 Mémoire conversationnelle et historique
+const userContexts = {};
+const messageHistory = {};
+
 // ⚡ Fake users RH
 const fakeUsers = [
-  const fakeUsers = [
   { id: '1', email: 'valentin.calvo@lyon.fr', password: '1234', service: 'Direction' },
   { id: '2', email: 'axelle.coatan@lyon.fr', password: '1234', service: 'Direction' },
   { id: '3', email: 'manon.latapie@lyon.fr', password: '1234', service: 'Direction' },
-  { id: '4', email: 'perrine.moerman@lyon.fr', password: '1234', service: 'Direction' }, // <== ICI
+  { id: '4', email: 'perrine.moerman@lyon.fr', password: '1234', service: 'Direction' },
   { id: '5', email: 'testeur.ppa@lyon.fr', password: 'PPA', service: 'Testeur' }
 ];
-
-];
-
-// 💾 Historique des messages par utilisateur
-const messageHistory = {};
 
 // 🔐 Login endpoint
 app.post('/login', (req, res) => {
@@ -41,6 +35,7 @@ app.post('/login', (req, res) => {
   }
 });
 
+// 📄 CV
 app.get("/cv/:userId", async (req, res) => {
   const profiles = await fs.readJson("./data/profiles.json");
   const user = profiles.find(p => p.id === req.params.userId);
@@ -58,6 +53,7 @@ app.post("/cv/:userId", async (req, res) => {
   res.json({ success: true });
 });
 
+// 📁 Applications
 app.get("/applications/:userId", async (req, res) => {
   const apps = await fs.readJson("./data/applications.json");
   const userApps = apps.filter(a => a.userId === req.params.userId);
@@ -72,6 +68,7 @@ app.post("/applications", async (req, res) => {
   res.json({ success: true });
 });
 
+// 📤 Upload
 app.post("/upload", upload.single("file"), async (req, res) => {
   const { userId } = req.body;
   const documents = await fs.readJson("./data/documents.json");
@@ -102,7 +99,7 @@ app.get('/appointments/slots', async (req, res) => {
   res.json({ slots: available });
 });
 
-// 📅 Réservation de créneau
+// 📅 Réservation
 app.post('/appointments/book', async (req, res) => {
   const { userId, slot } = req.body;
   if (!userId || !slot) {
@@ -121,7 +118,7 @@ app.post('/appointments/book', async (req, res) => {
   res.json({ success: true, message: `RDV réservé pour ${slot}` });
 });
 
-// 📅 Obtenir les rendez-vous réservés d'un utilisateur
+// 📅 Liste des rendez-vous utilisateur
 app.get('/appointments/:userId', async (req, res) => {
   const { userId } = req.params;
   const appointments = await fs.readJson('./data/appointments.json');
@@ -129,7 +126,7 @@ app.get('/appointments/:userId', async (req, res) => {
   res.json(userAppointments);
 });
 
-// ❌ Annuler un rendez-vous
+// ❌ Annulation RDV
 app.delete('/appointments/:appointmentId', async (req, res) => {
   const appointmentId = req.params.appointmentId;
   let appointments = await fs.readJson('./data/appointments.json');
@@ -145,7 +142,7 @@ app.delete('/appointments/:appointmentId', async (req, res) => {
   res.json({ success: true });
 });
 
-// 💬 Historique (fictif pour le moment)
+// 🕓 Historique fictif
 app.get('/history/:userId', (req, res) => {
   const userId = req.params.userId;
   const messages = messageHistory[userId] || [];
@@ -169,7 +166,6 @@ app.post("/chat", (req, res) => {
 
   let reply = "Je suis désolé, je n'ai pas compris votre question. Pouvez-vous la reformuler ?";
 
-  // Réponses simples
   if (/bonjour|salut/.test(message)) reply = "Bonjour ! Comment puis-je vous aider concernant la Métropole de Lyon ?";
   else if (/merci/.test(message)) reply = "Avec plaisir ! N'hésitez pas à poser d'autres questions.";
   else if (/au revoir|à bientôt/.test(message)) reply = "Au revoir et à bientôt !";
@@ -211,12 +207,11 @@ app.post("/chat", (req, res) => {
   if (!messageHistory[userId]) messageHistory[userId] = [];
   messageHistory[userId].push({ sender: 'user', text: message });
 
-  // 🔍 Recherche dans les articles du règlement
-  outer: for (const section of reglement) {
+  for (const section of reglement) {
     for (const article of section.articles) {
       if (Array.isArray(article.questions) && article.questions.some(q => message.includes(q))) {
         reply = `${article.emoji} *${section.titre} - ${article.sous_titre}*\n${article.texte_complet}`;
-        break outer;
+        break;
       }
     }
   }
@@ -233,7 +228,7 @@ app.post("/chat", (req, res) => {
   res.json({ reply });
 });
 
-// 🚀 Lancement du serveur
+// 🚀 Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Serveur en ligne sur http://localhost:${PORT}`);
