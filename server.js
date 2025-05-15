@@ -211,9 +211,9 @@ app.post("/chat", (req, res) => {
   } else if (/contact|rh|recrutement/.test(message)) {
     reply = "Vous pouvez contacter le service RH à emploi@grandlyon.com...";
 
-  // ✅ D'abord la condition la plus spécifique
-} else if (/prendre\s*rendez[- ]?vous/.test(message)) {
+ } else if (/^(prendre\s*)?rendez[- ]?vous$|^rdv$|^réserver$|^disponibilités$|^créneaux$/.test(message.trim())) {
   reply = "Voici les créneaux disponibles : [EN ATTENTE DE CHARGEMENT].";
+}
 
 // ✅ Puis la condition plus générale
 } else if (/rendez-vous|rdv|rencontrer.*rh/.test(message)) {
