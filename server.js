@@ -21,7 +21,7 @@ const fakeUsers = [
   { id: '2', email: 'axelle.coatan@lyon.fr', password: '1234', service: 'Direction' },
   { id: '3', email: 'manon.latapie@lyon.fr', password: '1234', service: 'Direction' },
   { id: '4', email: 'perrine.moerman@lyon.fr', password: '1234', service: 'Direction' }
-  { id: '4', email: 'testeur', password: 'PPA', service: 'Testeur' }
+  { id: '5', email: 'testeur.ppa@lyon.fr', password: 'PPA', service: 'Testeur' }
 ];
 
 // 💾 Historique des messages par utilisateur
