@@ -215,9 +215,9 @@ app.post("/chat", (req, res) => {
   } else if (/rendez-vous|rdv|rencontrer.*rh/.test(message.toLowerCase())) {
     reply = "Souhaitez-vous réserver un créneau avec un conseiller RH ? Tapez **'prendre rendez-vous'** pour continuer.";
 
-  } else if (/prendre.*rendez-vous/.test(message.toLowerCase())) {
-    reply = "Voici les créneaux disponibles : [EN ATTENTE DE CHARGEMENT].";
-  }
+ } else if (/prendre\s*rendez[- ]?vous/.test(message.toLowerCase())) {
+  reply = "Voici les créneaux disponibles : [EN ATTENTE DE CHARGEMENT].";
+}
 
   // 🧠 Historique
   if (!messageHistory[userId]) {
