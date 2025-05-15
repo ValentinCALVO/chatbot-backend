@@ -149,9 +149,19 @@ app.get('/history/:userId', (req, res) => {
 });
 
 // 🤖 Chat principal
+function findSimilarContext(userId, currentMsg) {
+  const context = userContexts[userId] || [];
+  return context.find(entry =>
+    entry.sender === "user" &&
+    currentMsg.includes(entry.text.slice(0, 15)) &&
+    currentMsg.length > 20 // évite les faux positifs
+  );
+}
+
 app.post("/chat", (req, res) => {
   const message = req.body.message.toLowerCase();
   const userId = req.body.userId;
+  if (!userContexts[userId]) userContexts[userId] = [];
 
   let reply = "Je suis désolé, je n'ai pas compris votre question. Pouvez-vous la reformuler ?";
 
@@ -213,6 +223,10 @@ app.post("/chat", (req, res) => {
  } else if (/contact|rh|recrutement/.test(message)) {
   reply = "Vous pouvez contacter le service RH à emploi@grandlyon.com.";
 }
+    const similar = findSimilarContext(userId, message);
+if (similar) {
+  reply += `\n🔁 Vous m'aviez posé une question similaire plus tôt. Souhaitez-vous que nous approfondissions ce sujet ?`;
+}
 
 // 🎯 Bloc spécifique : si l'utilisateur tape "rdv", "réserver", etc.
 else if (/^(prendre\s*)?rendez[- ]?vous$|^rdv$|^réserver$|^disponibilités$|^créneaux$/.test(message.trim())) {
@@ -236,6 +250,14 @@ for (const article of reglement) {
     reply = `${article.emoji} ${article.reponse}`;
     break;
   }
+}
+
+userContexts[userId].push({ sender: 'user', text: message });
+userContexts[userId].push({ sender: 'bot', text: reply });
+
+// Garde seulement les 10 derniers échanges pour éviter la surcharge
+if (userContexts[userId].length > 20) {
+  userContexts[userId] = userContexts[userId].slice(-20);
 }
   
   res.json({ reply });
