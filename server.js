@@ -1,5 +1,4 @@
 const userContexts = {}; // Mémoire conversationnelle par utilisateur
-const followUpMap = {};  // Suivi de sujet en attente
 
 import reglement from './data/reglement.json' assert { type: "json" };
 import express from "express";
@@ -24,149 +23,21 @@ const fakeUsers = [
   { id: '4', email: 'perrine.moerman@lyon.fr', password: '1234', service: 'Direction' }
 ];
 
+// 💾 Historique des messages par utilisateur
 const messageHistory = {};
 
-// 🔍 Fonction pour détecter les articles pertinents du règlement
-function chercherArticlesPertinents(message) {
-  const motsCle = message.toLowerCase().split(/[\s,;.!?]+/);
-  const resultats = [];
-
-  for (const section of reglement) {
-    for (const article of section.articles) {
-      if (article.questions.some(q => motsCle.includes(q))) {
-        resultats.push({
-          ...article,
-          titre_section: section.titre
-        });
-      }
-    }
+// 🔐 Login endpoint
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  const user = fakeUsers.find(u => u.email === email && u.password === password);
+  if (user) {
+    res.json({ user: { id: user.id, email: user.email, service: user.service } });
+  } else {
+    res.status(401).json({ error: "Identifiants incorrects" });
   }
-  return resultats;
-}
-
-// 📄 Fonction pour rechercher une question similaire
-function findSimilarContext(userId, currentMsg) {
-  const context = userContexts[userId] || [];
-  return context.find(entry =>
-    entry.sender === "user" &&
-    currentMsg.includes(entry.text.slice(0, 15)) &&
-    currentMsg.length > 20
-  );
-}
-
-// 🤖 Chat principal
-app.post("/chat", (req, res) => {
-  const message = req.body.message.toLowerCase();
-  const userId = req.body.userId;
-  if (!userContexts[userId]) userContexts[userId] = [];
-
-  // 🧠 1. Réponse règlementaire enrichie
-  const articlesTrouves = chercherArticlesPertinents(message);
-
-  if (articlesTrouves.length > 0) {
-    const rich = {
-      type: "rich",
-      className: "bubble",
-      elements: articlesTrouves.map(a => ({
-        type: "accordion",
-        title: `${a.emoji} ${a.titre_section} – ${a.sous_titre}`,
-        content: `${a.resume}\n\n${a.texte_complet}\n📄 Source : ${a.reference}`
-      }))
-    };
-
-    if (!messageHistory[userId]) messageHistory[userId] = [];
-    messageHistory[userId].push({ sender: "user", text: message });
-    messageHistory[userId].push({ sender: "bot", text: `[Réponse réglementaire : ${articlesTrouves.map(a => a.reference).join(", ")}]` });
-
-    userContexts[userId].push({ sender: 'user', text: message });
-    userContexts[userId].push({ sender: 'bot', text: `[Réponse règlementaire]` });
-
-    return res.json({ reply: "", rich });
-  }
-
-  // 🔁 Réponses conditionnelles aux suivis "oui / non"
-  let reply = "Je suis désolé, je n'ai pas compris votre question. Pouvez-vous la reformuler ?";
-
-  if (followUpMap[userId] && /^(oui|yes|ok|d'accord)$/.test(message.trim())) {
-    const topic = followUpMap[userId];
-    followUpMap[userId] = null;
-
-    if (topic === "cv") {
-      reply = "Voici des conseils plus poussés sur le CV : utilisez des verbes d'action, structurez votre document clairement, adaptez-le à l’offre.";
-    } else if (topic === "formation") {
-      reply = "Voici les types de formations proposées à la Métropole : numérique, management, développement personnel...";
-    } else {
-      reply = "Très bien, approfondissons ce sujet ensemble.";
-    }
-
-    messageHistory[userId] = messageHistory[userId] || [];
-    messageHistory[userId].push({ sender: 'user', text: message });
-    messageHistory[userId].push({ sender: 'bot', text: reply });
-
-    userContexts[userId].push({ sender: 'user', text: message });
-    userContexts[userId].push({ sender: 'bot', text: reply });
-    return res.json({ reply });
-  }
-
-  if (followUpMap[userId] && /^(non|pas maintenant|plus tard)$/.test(message.trim())) {
-    followUpMap[userId] = null;
-    reply = "Pas de souci. Si vous voulez y revenir plus tard, je suis là.";
-    return res.json({ reply });
-  }
-
-  // 🧠 Réponses prédéfinies
-  if (/cv|curriculum/.test(message)) {
-    reply = "Un bon CV doit être clair, concis et valoriser vos expériences pertinentes...";
-  } else if (/lettre|motivation/.test(message)) {
-    reply = "Votre lettre doit exprimer votre intérêt pour les missions publiques...";
-  } else if (/formation|se former/.test(message)) {
-    reply = "62% des agents sont formés chaque année...";
-  } else if (/emploi|poste|offre|vacance/.test(message)) {
-    reply = "Toutes nos offres sont disponibles sur : https://www.grandlyon.com/services/nous-rejoindre/nos-offres-demploi.html";
-  } else if (/entretien|oral|recruteur|face à face/.test(message)) {
-    reply = "Préparez des exemples concrets, informez-vous sur la Métropole...";
-  } else if (/mobilité/.test(message)) {
-    reply = "Nos conseillers RH accompagnent les agents souhaitant évoluer...";
-  } else if (/bonjour|salut/.test(message)) {
-    reply = "Bonjour ! Comment puis-je vous aider concernant la Métropole de Lyon ?";
-  } else if (/merci/.test(message)) {
-    reply = "Avec plaisir ! N'hésitez pas à poser d'autres questions.";
-  } else if (/au revoir|à bientôt/.test(message)) {
-    reply = "Au revoir et à bientôt !";
-  } else if (/télétravail/.test(message)) {
-    reply = "Jusqu’à 2 jours de télétravail par semaine sont possibles...";
-  } else if (/candidature|recrutement|postuler|embauche/.test(message)) {
-    reply = "Vous pouvez postuler via https://www.grandlyon.com...";
-  } else if (/concours/.test(message)) {
-    reply = "Le concours est la voie classique pour devenir fonctionnaire territorial...";
-  } else if (/job d'été|emploi saisonnier/.test(message)) {
-    reply = "Des jobs d’été sont disponibles...";
-  }
-
-  // 🧠 Historique + similarité
-  if (!messageHistory[userId]) messageHistory[userId] = [];
-  messageHistory[userId].push({ sender: 'user', text: message });
-  messageHistory[userId].push({ sender: 'bot', text: reply });
-
-  const similar = findSimilarContext(userId, message);
-  if (similar) {
-    reply += `\n🔁 Vous m'aviez posé une question similaire plus tôt. Souhaitez-vous que nous approfondissions ce sujet ?`;
-
-    if (similar.text.includes("cv")) followUpMap[userId] = "cv";
-    else if (similar.text.includes("formation")) followUpMap[userId] = "formation";
-  }
-
-  userContexts[userId].push({ sender: 'user', text: message });
-  userContexts[userId].push({ sender: 'bot', text: reply });
-  if (userContexts[userId].length > 20) {
-    userContexts[userId] = userContexts[userId].slice(-20);
-  }
-
-  res.json({ reply });
 });
 
-// 📁 Autres routes existantes (inchangées)
-app.get('/cv/:userId', async (req, res) => {
+app.get("/cv/:userId", async (req, res) => {
   const profiles = await fs.readJson("./data/profiles.json");
   const user = profiles.find(p => p.id === req.params.userId);
   if (!user) return res.status(404).json({ error: "Profil non trouvé" });
@@ -213,6 +84,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   res.json({ success: true });
 });
 
+// 📅 Créneaux disponibles
 app.get('/appointments/slots', async (req, res) => {
   const appointments = await fs.readJson('./data/appointments.json');
   const takenSlots = appointments.map(a => a.slot);
@@ -226,6 +98,7 @@ app.get('/appointments/slots', async (req, res) => {
   res.json({ slots: available });
 });
 
+// 📅 Réservation de créneau
 app.post('/appointments/book', async (req, res) => {
   const { userId, slot } = req.body;
   if (!userId || !slot) {
@@ -241,9 +114,10 @@ app.post('/appointments/book', async (req, res) => {
   await fs.writeJson('./data/appointments.json', appointments, { spaces: 2 });
 
   console.log(`📧 Email simulé à l'utilisateur ${userId} : Confirmation du RDV le ${slot}`);
-  res.json({ success: true, message: `RDV réservé pour ${slot}` });
+res.json({ success: true, message: `RDV réservé pour ${slot}` });
 });
 
+// 📅 Obtenir les rendez-vous réservés d'un utilisateur
 app.get('/appointments/:userId', async (req, res) => {
   const { userId } = req.params;
   const appointments = await fs.readJson('./data/appointments.json');
@@ -251,6 +125,7 @@ app.get('/appointments/:userId', async (req, res) => {
   res.json(userAppointments);
 });
 
+// ❌ Annuler un rendez-vous
 app.delete('/appointments/:appointmentId', async (req, res) => {
   const appointmentId = req.params.appointmentId;
   let appointments = await fs.readJson('./data/appointments.json');
@@ -266,13 +141,129 @@ app.delete('/appointments/:appointmentId', async (req, res) => {
   res.json({ success: true });
 });
 
+// 💬 Historique (fictif pour le moment)
 app.get('/history/:userId', (req, res) => {
   const userId = req.params.userId;
   const messages = messageHistory[userId] || [];
   res.json({ messages });
 });
 
-// 🚀 Serveur
+// 🤖 Chat principal
+function findSimilarContext(userId, currentMsg) {
+  const context = userContexts[userId] || [];
+  return context.find(entry =>
+    entry.sender === "user" &&
+    currentMsg.includes(entry.text.slice(0, 15)) &&
+    currentMsg.length > 20 // évite les faux positifs
+  );
+}
+
+app.post("/chat", (req, res) => {
+  const message = req.body.message.toLowerCase();
+  const userId = req.body.userId;
+  if (!userContexts[userId]) userContexts[userId] = [];
+
+  let reply = "Je suis désolé, je n'ai pas compris votre question. Pouvez-vous la reformuler ?";
+
+  if (/bonjour|salut/.test(message)) {
+    reply = "Bonjour ! Comment puis-je vous aider concernant la Métropole de Lyon ?";
+  } else if (/merci/.test(message)) {
+    reply = "Avec plaisir ! N'hésitez pas à poser d'autres questions.";
+  } else if (/au revoir|à bientôt/.test(message)) {
+    reply = "Au revoir et à bientôt !";
+  } else if (/ça va|ca va/.test(message)) {
+    reply = "Je vais bien, merci ! Et vous, comment puis-je vous aider ?";
+
+  } else if (/candidature|recrutement|postuler|embauche/.test(message)) {
+    reply = "Vous pouvez postuler via https://www.grandlyon.com...";
+  } else if (/cv|curriculum/.test(message)) {
+    reply = "Un bon CV doit être clair, concis et valoriser vos expériences pertinentes...";
+  } else if (/lettre|motivation/.test(message)) {
+    reply = "Votre lettre doit exprimer votre intérêt pour les missions publiques...";
+  } else if (/entretien|oral|recruteur|face à face/.test(message)) {
+    reply = "Préparez des exemples concrets, informez-vous sur la Métropole...";
+  } else if (/emploi|poste|offre|vacance/.test(message)) {
+    reply = "Toutes nos offres sont disponibles sur : https://www.grandlyon.com/services/nous-rejoindre/nos-offres-demploi.html";
+  } else if (/formation|se former/.test(message)) {
+    reply = "62% des agents sont formés chaque année...";
+  } else if (/mobilité/.test(message)) {
+    reply = "Nos conseillers RH accompagnent les agents souhaitant évoluer...";
+  } else if (/télétravail/.test(message)) {
+    reply = "Jusqu’à 2 jours de télétravail par semaine sont possibles...";
+  } else if (/semaine.*4 jours/.test(message)) {
+    reply = "Depuis 2023, les agents volontaires peuvent expérimenter la semaine de 4 jours.";
+  } else if (/vie pro.*vie perso|équilibre/.test(message)) {
+    reply = "La Métropole met en œuvre des dispositifs concrets...";
+  } else if (/valeurs|rse|responsabilité/.test(message)) {
+    reply = "Nous agissons pour l’inclusion, la diversité, l’égalité...";
+  } else if (/concours/.test(message)) {
+    reply = "Le concours est la voie classique pour devenir fonctionnaire territorial...";
+  } else if (/cdd|contrat/.test(message)) {
+    reply = "Des CDD sont possibles pour remplacement ou besoins ponctuels...";
+  } else if (/apprentissage|alternance/.test(message)) {
+    reply = "La Métropole propose des contrats d’apprentissage dans +10 domaines.";
+  } else if (/job d'été|emploi saisonnier/.test(message)) {
+    reply = "Des jobs d’été sont disponibles...";
+  } else if (/handicap|rqth/.test(message)) {
+    reply = "Les agents en situation de handicap bénéficient d’un accompagnement...";
+  } else if (/communes/.test(message)) {
+    reply = "La Métropole regroupe 58 communes.";
+  } else if (/habitants/.test(message)) {
+    reply = "La Métropole de Lyon compte environ 1,4 million d'habitants.";
+  } else if (/métiers/.test(message)) {
+    reply = "Plus de 250 métiers différents sont exercés dans la Métropole.";
+  } else if (/secteurs|domaines/.test(message)) {
+    reply = "Environnement, urbanisme, social, médico-social, RH, numérique...";
+  } else if (/restaurant|repas/.test(message)) {
+    reply = "Vous bénéficiez de titres-restaurant ou d’un restaurant collectif.";
+  } else if (/comité|loisirs/.test(message)) {
+    reply = "Vous avez accès à l’offre du COS (culture, loisirs, voyages...).";
+  } else if (/conciergerie/.test(message)) {
+    reply = "Des services de conciergerie sont accessibles selon le lieu de travail.";
+ } else if (/contact|rh|recrutement/.test(message)) {
+  reply = "Vous pouvez contacter le service RH à emploi@grandlyon.com.";
+}
+    const similar = findSimilarContext(userId, message);
+if (similar) {
+  reply += `\n🔁 Vous m'aviez posé une question similaire plus tôt. Souhaitez-vous que nous approfondissions ce sujet ?`;
+}
+
+// 🎯 Bloc spécifique : si l'utilisateur tape "rdv", "réserver", etc.
+else if (/^(prendre\s*)?rendez[- ]?vous$|^rdv$|^réserver$|^disponibilités$|^créneaux$/.test(message.trim())) {
+  reply = "Voici les créneaux disponibles : [EN ATTENTE DE CHARGEMENT].";
+}
+
+// 💬 Bloc général : si l'utilisateur dit "je veux parler RH" ou "rendez-vous ?"
+else if (/(rendez[- ]?vous|rdv|rencontrer.*rh)/.test(message)) {
+  reply = "Souhaitez-vous réserver un créneau avec un conseiller RH ? Tapez **'rdv'** ou **'réserver'** pour continuer.";
+}
+
+  // 🧠 Historique
+  if (!messageHistory[userId]) {
+    messageHistory[userId] = [];
+  }
+  messageHistory[userId].push({ sender: 'user', text: message });
+  messageHistory[userId].push({ sender: 'bot', text: reply });
+
+for (const article of reglement) {
+  if (article.questions.some(q => message.includes(q))) {
+    reply = `${article.emoji} ${article.reponse}`;
+    break;
+  }
+}
+
+userContexts[userId].push({ sender: 'user', text: message });
+userContexts[userId].push({ sender: 'bot', text: reply });
+
+// Garde seulement les 10 derniers échanges pour éviter la surcharge
+if (userContexts[userId].length > 20) {
+  userContexts[userId] = userContexts[userId].slice(-20);
+}
+  
+  res.json({ reply });
+});
+
+// 🚀 Lancement du serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Serveur en ligne sur http://localhost:${PORT}`);
