@@ -1,62 +1,113 @@
 [
   {
-    "theme": "Santé et sécurité - EPI",
-    "emoji": "🦺",
-    "questions": ["équipements", "epi", "chaussures", "protection"],
-    "reponse": "Le port des équipements de protection individuelle (EPI), dont les chaussures de sécurité, est obligatoire dans les zones où des risques sont identifiés."
+    "titre": "Santé et sécurité",
+    "articles": [
+      {
+        "numero": 1,
+        "sous_titre": "Équipements de Protection Individuelle (EPI)",
+        "emoji": "🦺",
+        "questions": ["équipements", "epi", "chaussures", "protection", "sécurité"],
+        "resume": "Le port des EPI, y compris les chaussures de sécurité, est obligatoire dans les zones à risque.",
+        "texte_complet": "Le port des équipements de protection individuelle est obligatoire dans les zones et situations où des risques pour la santé et la sécurité sont identifiés. Le port de chaussures de sécurité est obligatoire dans les zones de travail où des risques de blessures aux pieds sont présents.",
+        "reference": "Article 1"
+      },
+      {
+        "numero": 2,
+        "sous_titre": "Usage du tabac",
+        "emoji": "🚭",
+        "questions": ["fumer", "tabac", "pause cigarette", "cigarette électronique"],
+        "resume": "Interdiction de fumer dans les locaux, sauf espaces désignés. 2 pauses de 10 min autorisées par jour.",
+        "texte_complet": "Il est interdit de fumer dans l’enceinte de la Métropole, sauf dans les espaces fumeurs désignés. Les temps de pause pour les fumeurs sont limités à deux pauses de 10 minutes par jour, en accord avec les horaires de travail.",
+        "reference": "Article 2"
+      }
+    ]
   },
   {
-    "theme": "Santé et sécurité - Tabac",
-    "emoji": "🚭",
-    "questions": ["fumer", "cigarette", "pause cigarette", "tabac"],
-    "reponse": "Il est interdit de fumer dans l'enceinte de la Métropole de Lyon, sauf dans les espaces fumeurs désignés. Les pauses fumeurs sont limitées à deux fois 10 minutes par jour."
+    "titre": "Discipline",
+    "articles": [
+      {
+        "numero": 3,
+        "sous_titre": "Sanctions disciplinaires",
+        "emoji": "⚖️",
+        "questions": ["sanction", "avertissement", "mise à pied", "licenciement", "rétrogradation", "mutation disciplinaire"],
+        "resume": "Différents niveaux de sanctions existent selon la gravité des faits, du simple avertissement au licenciement.",
+        "texte_complet": "Des sanctions peuvent être appliquées selon la gravité des faits : avertissement écrit, mise à pied (max 5 jours), rétrogradation, mutation disciplinaire ou licenciement.",
+        "reference": "Article 3"
+      },
+      {
+        "numero": 4,
+        "sous_titre": "Procédure disciplinaire",
+        "emoji": "📄",
+        "questions": ["procédure disciplinaire", "notification", "défense", "droit de réponse"],
+        "resume": "Toute sanction doit être notifiée par écrit. L’agent a le droit de se défendre.",
+        "texte_complet": "Toute sanction est notifiée par écrit à l'employé concerné. Celui-ci a le droit de se défendre avant toute sanction.",
+        "reference": "Article 4"
+      }
+    ]
   },
   {
-    "theme": "Respect et bienséance",
-    "emoji": "🤝",
-    "questions": ["respect", "bienséance", "insultes", "conflit", "collègue"],
-    "reponse": "Tous les agents doivent faire preuve de respect mutuel. Tout comportement discriminatoire, harcelant ou irrespectueux est interdit."
+    "titre": "Horaires de travail",
+    "articles": [
+      {
+        "numero": 5,
+        "sous_titre": "Horaires collectifs",
+        "emoji": "⏰",
+        "questions": ["horaire", "temps de travail", "flexible", "9h", "17h"],
+        "resume": "Horaires standards de 9h00 à 17h00. Flexibilité possible avec l’accord du service.",
+        "texte_complet": "Les horaires standards sont de 9h00 à 17h00 du lundi au vendredi. Des horaires flexibles peuvent être mis en place en accord avec les responsables de service.",
+        "reference": "Article 5"
+      }
+    ]
   },
   {
-    "theme": "Discipline - Sanctions",
-    "emoji": "⚖️",
-    "questions": ["sanction", "avertissement", "mise à pied", "licenciement", "rétrogradation", "mutation disciplinaire"],
-    "reponse": "Des sanctions peuvent être appliquées selon la gravité des faits : avertissement écrit, mise à pied (max 5 jours), rétrogradation, mutation disciplinaire ou licenciement."
+    "titre": "Respect, harcèlement et discrimination",
+    "articles": [
+      {
+        "numero": 6,
+        "sous_titre": "Harcèlement et agissements sexistes",
+        "emoji": "🛡️",
+        "questions": ["harcèlement", "sexiste", "violence", "agression", "comportement inapproprié"],
+        "resume": "Harcèlement et sexisme sont interdits. Signalez les faits à la DRH.",
+        "texte_complet": "Tout harcèlement ou comportement sexiste est strictement interdit. Toute personne victime ou témoin doit signaler les faits à la direction RH.",
+        "reference": "Article 6"
+      },
+      {
+        "numero": 7,
+        "sous_titre": "Discrimination et neutralité",
+        "emoji": "🚫",
+        "questions": ["discrimination", "égalité", "religion", "conviction", "neutralité"],
+        "resume": "Discrimination interdite. Neutralité religieuse et idéologique de la Métropole.",
+        "texte_complet": "Toute forme de discrimination est interdite. La Métropole est neutre en termes de religion et de convictions personnelles.",
+        "reference": "Article 7"
+      }
+    ]
   },
   {
-    "theme": "Discipline - Procédure",
-    "emoji": "📄",
-    "questions": ["procédure disciplinaire", "notification", "défense", "droit de réponse"],
-    "reponse": "Toute sanction est notifiée par écrit. L'agent concerné a toujours le droit de se défendre avant l'application d'une sanction."
+    "titre": "Lanceurs d’alerte",
+    "articles": [
+      {
+        "numero": 8,
+        "sous_titre": "Protection et confidentialité",
+        "emoji": "📣",
+        "questions": ["alerte", "lanceur", "signalement", "confidentiel", "manquement grave"],
+        "resume": "Un dispositif de protection des lanceurs d’alerte existe pour signaler tout manquement grave.",
+        "texte_complet": "La Métropole met en place un dispositif de protection des lanceurs d’alerte. Vous pouvez signaler tout manquement grave en toute confidentialité.",
+        "reference": "Article 8"
+      }
+    ]
   },
   {
-    "theme": "Horaires de travail",
-    "emoji": "⏰",
-    "questions": ["horaire", "temps de travail", "flexible", "9h", "17h"],
-    "reponse": "Les horaires standards sont de 9h00 à 17h00 du lundi au vendredi. Des horaires flexibles peuvent être mis en place avec l'accord du responsable de service."
-  },
-  {
-    "theme": "Harcèlement et agissements sexistes",
-    "emoji": "🛡️",
-    "questions": ["harcèlement", "sexiste", "violence", "agression", "comportement inapproprié"],
-    "reponse": "Tout harcèlement ou comportement sexiste est strictement interdit. Tout agent victime ou témoin peut signaler les faits à la DRH."
-  },
-  {
-    "theme": "Discrimination",
-    "emoji": "🚫",
-    "questions": ["discrimination", "égalité", "religion", "conviction", "neutralité"],
-    "reponse": "Toute forme de discrimination est interdite. La Métropole de Lyon est neutre sur le plan religieux et idéologique."
-  },
-  {
-    "theme": "Lanceurs d’alerte",
-    "emoji": "📣",
-    "questions": ["alerte", "lanceur", "signalement", "confidentiel", "manquement grave"],
-    "reponse": "La Métropole met en place un dispositif de protection des lanceurs d’alerte. Vous pouvez signaler tout manquement grave en toute confidentialité."
-  },
-  {
-    "theme": "Modification du règlement",
-    "emoji": "📘",
-    "questions": ["modification règlement", "mise à jour", "changement règlement"],
-    "reponse": "Le règlement intérieur peut être modifié par décision du Conseil de la Métropole de Lyon, à la majorité des membres présents ou représentés."
+    "titre": "Mise à jour du règlement",
+    "articles": [
+      {
+        "numero": 9,
+        "sous_titre": "Modification du règlement",
+        "emoji": "📘",
+        "questions": ["modification règlement", "mise à jour", "changement règlement"],
+        "resume": "Le règlement peut être modifié par vote du Conseil de la Métropole.",
+        "texte_complet": "Le règlement intérieur peut être modifié par une délibération du Conseil de la Métropole de Lyon, adoptée à la majorité des membres présents ou représentés.",
+        "reference": "Article 9"
+      }
+    ]
   }
 ]
